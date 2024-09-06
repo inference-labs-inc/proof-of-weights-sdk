@@ -22,6 +22,7 @@ The proof of weights SDK is available on PyPI as `proof-of-weights` (https://pyp
 
 ```python
 import proof_of_weights
-proof_of_weights.submit_inputs(reward_function_inputs: list)
-proof_of_weights.get_proof()
+proofs = proof_of_weights.Proof_Of_Weights(wallet_name: str, wallet_hotkey: str, omron_validator_ss58: str, netuid: int, network: str = "finney")
+proofs.submit_inputs(reward_function_inputs: list)
+proofs.get_proof()
 ```

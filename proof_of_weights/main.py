@@ -5,7 +5,7 @@ import typing
 import bittensor
 import requests
 
-__VERSION__: typing.Final[str] = "0.0.1"
+__version__: typing.Final[str] = "0.0.1"
 OMRON_NETUID: typing.Final[int] = 2
 
 
@@ -17,7 +17,7 @@ class Proof_Of_Weights:
         self._wallet = bittensor.wallet(wallet_name, wallet_hotkey)
         self._btnetwork = bittensor.subtensor(network=network)
         self._omron_validator_ss58 = omron_validator_ss58
-        self._omron_validator_axon = self._bt_newtork.get_axon_info(netuid=OMRON_NETUID, hotkey_ss58=self.omron_validator_ss58)
+        self._omron_validator_axon = self._btnetwork.get_axon_info(netuid=OMRON_NETUID, hotkey_ss58=self.omron_validator_ss58)
         self._omron_validator_ip = self._omron_validator_axon.ip
         self._netuid = netuid
         self._last_transaction_hash = ""

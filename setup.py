@@ -7,7 +7,7 @@ with open("README.md", "r") as f:
 setuptools.setup(
     name="Proof of Weights",
     version=proof_of_weights.__version__,
-    python_requires=">3.6.*",
+    python_requires=">3.6",
     description="SDK for validators from various subnets to publish their reward function inputs to validators within the omron subnet.",
     long_description=long_description,
     long_description_content_type="text/markdown",

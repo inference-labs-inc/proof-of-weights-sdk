@@ -15,6 +15,7 @@ setuptools.setup(
     packages=["proof_of_weights"],
     classifiers=[
         "Programming Language :: Python :: 3",
+        "Development Status :: 1 - Planning",
     ],
     requires=["requests", "bittensor"],
 )

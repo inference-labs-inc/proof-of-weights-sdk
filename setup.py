@@ -18,4 +18,5 @@ setuptools.setup(
         "Development Status :: 1 - Planning",
     ],
     requires=["requests", "bittensor"],
+    test_suite="tests",
 )

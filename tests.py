@@ -19,9 +19,9 @@ class Test_Proof_of_Weights(unittest.TestCase):
         os.mkdir("omron-validator-api")
         # get latest api
         with open("omron-validator-api/main.py", "w") as f:
-            f.write(requests.get("https://raw.githubusercontent.com/inference-labs-inc/omron-validator-api/feat-proof-of-weights-sdk/main.py").text)
+            f.write(requests.get("https://raw.githubusercontent.com/inference-labs-inc/omron-validator-api/main/main.py").text)
         # get requirements for api
-        requirements = requests.get("https://raw.githubusercontent.com/inference-labs-inc/omron-validator-api/feat-proof-of-weights-sdk/requirements.txt").text
+        requirements = requests.get("https://raw.githubusercontent.com/inference-labs-inc/omron-validator-api/main/requirements.txt").text
         # check if the requirements are installed
         for requirement in requirements.split("\n"):
             if requirement:

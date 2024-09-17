@@ -38,7 +38,7 @@ class Test_Proof_of_Weights(unittest.TestCase):
         # run the api and get the pid to kill it later
         env = os.environ
         env["VALIDATOR_PATH"] = "."
-        env["LAZY_RUN"] = "true"
+        env["DRY_RUN"] = "true"
         os.chdir("omron-validator-api")
         cls.api_process = subprocess.Popen(
             ["uvicorn", "main:app", "--host", "localhost", "--port", "8000"], env=env

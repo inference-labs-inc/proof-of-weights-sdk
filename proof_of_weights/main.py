@@ -38,6 +38,7 @@ class Proof_Of_Weights:
         self._omron_validator_ip = get_omron_validator_ip(omron_validator_ss58, network)
         self._netuid = netuid
         self._last_transaction_hash = ""
+        self.proof = None
 
     def submit_inputs(self, reward_function_inputs: list) -> str:
         """
@@ -53,7 +54,7 @@ class Proof_Of_Weights:
         # send the reward function inputs and signature to the omron subnet on port 8000
         response = requests.post(
             f"http://{self._omron_validator_ip}:8000/submit_inputs",
-            params={
+            json={
                 "inputs": input_str,
                 "signature": signature_str,
                 "sender": self._wallet.hotkey.ss58_address,
@@ -63,7 +64,9 @@ class Proof_Of_Weights:
         if response.status_code != 200:
             print("Failed to submit inputs:", response.text, file=sys.stderr)
             return ""
+        self.proof = response.json()
         # get the transaction hash
+        # XXX: is this really the transaction hash?
         self._last_transaction_hash = hashlib.sha256(
             input_bytes + signature
         ).hexdigest()
@@ -72,10 +75,6 @@ class Proof_Of_Weights:
     def get_proof(self) -> dict:
         """
         Get the proof of weights from the omron subnet validator.
+        Makes no sense as a separated method...
         """
-        response = requests.get(
-            f"http://{self._omron_validator_ip}:8000/get_proof_of_weights/{self._last_transaction_hash}"
-        )
-        if response.status_code != 200:
-            return {}
-        return response.json()
+        return self.proof

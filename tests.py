@@ -61,7 +61,20 @@ class Test_Proof_of_Weights(unittest.TestCase):
         pow = proof_of_weights.Proof_Of_Weights(
             "test_wallet", "test_wallet_hotkey", "null", 1
         )
-        transaction_hash = pow.submit_inputs([1, 2, 5, 3, 3])
+        transaction_hash = pow.submit_inputs(
+            {
+                "max_score": [0.0042553190141916275, 0.0042553190141916275],
+                "previous_score": [0.0, 0.0],
+                "verification_result": [False, False],
+                "proof_size": [5000, 5000],
+                "response_time": [600.0, 600.0],
+                "median_max_response_time": [600.0, 600.0],
+                "min_response_time": [0.0, 0.0],
+                "block_number": [0, 0],
+                "validator_uid": [0, 0],
+                "uid": [0, 0],
+            }
+        )
         print("Transaction hash:", transaction_hash)
 
 

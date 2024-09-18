@@ -7,8 +7,13 @@
         "bittensor",
         "btnetwork",
         "coldkey",
+        "fastapi",
+        "Keypair",
+        "levelname",
         "NETUID",
         "OMRON",
+        "pydantic",
+        "substrateinterface",
         "subtensor",
         "uvicorn"
     ],

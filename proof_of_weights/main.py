@@ -1,14 +1,24 @@
 import base64
 import hashlib
 import json
-import sys
+import os
 import typing
+import logging
 
 import bittensor
 import requests
 
 __version__: typing.Final[str] = "0.0.1"
 OMRON_NETUID: typing.Final[int] = 2
+
+logger = logging.getLogger(__name__)
+# logger.setLevel(logging.INFO)
+# logger.addHandler(logging.StreamHandler())
+# file_handler = logging.FileHandler(
+#     os.path.join(os.path.dirname(__file__), "proof_of_weights.log")
+# )
+# file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+# logger.addHandler(file_handler)
 
 
 def get_omron_validator_ip(omron_validator_ss58: str, network: str = "finney") -> str:
@@ -50,10 +60,14 @@ class Proof_Of_Weights:
         # encode the inputs and signature as base64
         input_str = base64.b64encode(input_bytes).decode("utf-8")
         signature_str = base64.b64encode(signature).decode("utf-8")
+        self._last_transaction_hash = hashlib.sha256(
+            input_bytes + signature
+        ).hexdigest()
+
         # send the reward function inputs and signature to the omron subnet on port 8000
         response = requests.post(
             f"http://{self._omron_validator_ip}:8000/submit_inputs",
-            params={
+            json={
                 "inputs": input_str,
                 "signature": signature_str,
                 "sender": self._wallet.hotkey.ss58_address,
@@ -61,12 +75,20 @@ class Proof_Of_Weights:
             },
         )
         if response.status_code != 200:
-            print("Failed to submit inputs:", response.text, file=sys.stderr)
+            logger.error(
+                f"Failed to submit inputs. Status code: {response.status_code}, "
+                f"Content: {response.content}"
+            )
             return ""
-        # get the transaction hash
-        self._last_transaction_hash = hashlib.sha256(
-            input_bytes + signature
-        ).hexdigest()
+
+        data = response.json()
+        if data.get("hash") != self._last_transaction_hash:
+            logger.error(
+                f"Transaction hash mismatch. Local: {self._last_transaction_hash}, "
+                f"Remote: {data.get('hash')}"
+            )
+            return ""
+
         return self._last_transaction_hash
 
     def get_proof(self) -> dict:

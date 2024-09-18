@@ -94,7 +94,6 @@ class Proof_Of_Weights:
     def get_proof(self) -> dict:
         """
         Get the proof of weights from the omron subnet validator.
-        Makes no sense as a separated method...
         """
         response = requests.get(
             f"http://{self._omron_validator_ip}:8000/get_proof_of_weights/{self._last_transaction_hash}"

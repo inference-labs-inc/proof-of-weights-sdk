@@ -82,10 +82,10 @@ class Proof_Of_Weights:
             return ""
 
         data = response.json()
-        if data["transaction_hash"] != self._last_transaction_hash:
+        if data.get("hash") != self._last_transaction_hash:
             logger.error(
                 f"Transaction hash mismatch. Local: {self._last_transaction_hash}, "
-                f"Remote: {data['transaction_hash']}"
+                f"Remote: {data.get('hash')}"
             )
             return ""
 

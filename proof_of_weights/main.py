@@ -68,7 +68,7 @@ class Proof_Of_Weights:
 
         # send the reward function inputs and signature to the omron subnet on port 8000
         response = requests.post(
-            f"http://{self._omron_validator_ip}:8000/submit_inputs",
+            f"http://{self._omron_validator_ip}:8000/submit-inputs",
             json={
                 "inputs": input_str,
                 "signature": signature_str,
@@ -98,7 +98,7 @@ class Proof_Of_Weights:
         Get the proof of weights from the omron subnet validator.
         """
         response = requests.get(
-            f"http://{self._omron_validator_ip}:8000/get_proof_of_weights/{self._last_transaction_hash}"
+            f"http://{self._omron_validator_ip}:8000/get-proof-of-weights/{self._last_transaction_hash}"
         )
         if response.status_code != 200:
             return {}

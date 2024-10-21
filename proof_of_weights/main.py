@@ -1,9 +1,9 @@
 import base64
 import hashlib
 import json
-import os
 import typing
 import logging
+from yarl import URL
 
 import bittensor
 import requests
@@ -11,6 +11,7 @@ import requests
 __version__: typing.Final[str] = "0.0.2"
 OMRON_NETUID_FINNEY: typing.Final[int] = 2
 OMRON_NETUID_TESTNET: typing.Final[int] = 118
+API_PORT: typing.Final[int] = 8000
 
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.INFO)
@@ -50,6 +51,9 @@ class Proof_Of_Weights:
         self._omron_validator_ip = get_omron_validator_ip(omron_validator_ss58, network)
         self._netuid = netuid
         self._last_transaction_hash = ""
+        self._base_url = URL.build(
+            scheme="http", host=self._omron_validator_ip, port=API_PORT
+        )
 
     def submit_inputs(self, reward_function_inputs: list) -> str:
         """
@@ -66,9 +70,9 @@ class Proof_Of_Weights:
             input_bytes + signature
         ).hexdigest()
 
-        # send the reward function inputs and signature to the omron subnet on port 8000
+        # send the reward function inputs and signature to the omron subnet on port API_PORT
         response = requests.post(
-            f"http://{self._omron_validator_ip}:8000/submit-inputs",
+            self._base_url.with_path("submit-inputs"),
             json={
                 "inputs": input_str,
                 "signature": signature_str,
@@ -98,7 +102,9 @@ class Proof_Of_Weights:
         Get the proof of weights from the omron subnet validator.
         """
         response = requests.get(
-            f"http://{self._omron_validator_ip}:8000/get-proof-of-weights/{self._last_transaction_hash}"
+            self._base_url.with_path(
+                f"get-proof-of-weights/{self._last_transaction_hash}"
+            )
         )
         if response.status_code != 200:
             return {}

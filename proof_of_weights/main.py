@@ -9,7 +9,8 @@ import bittensor
 import requests
 
 __version__: typing.Final[str] = "0.0.1"
-OMRON_NETUID: typing.Final[int] = 2
+OMRON_NETUID_FINNEY: typing.Final[int] = 2
+OMRON_NETUID_TESTNET: typing.Final[int] = 118
 
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.INFO)
@@ -27,7 +28,8 @@ def get_omron_validator_ip(omron_validator_ss58: str, network: str = "finney") -
     """
     btnetwork = bittensor.subtensor(network=network)
     omron_validator_axon = btnetwork.get_axon_info(
-        netuid=OMRON_NETUID, hotkey_ss58=omron_validator_ss58
+        netuid=(OMRON_NETUID_FINNEY if network == "finney" else OMRON_NETUID_TESTNET),
+        hotkey_ss58=omron_validator_ss58,
     )
     return omron_validator_axon.ip
 

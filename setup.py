@@ -20,6 +20,6 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "Development Status :: 1 - Planning",
     ],
-    requires=["requests", "bittensor"],
+    requires=["requests", "bittensor", "yarl"],
     test_suite="tests",
 )

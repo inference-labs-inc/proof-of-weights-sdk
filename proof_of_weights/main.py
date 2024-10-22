@@ -8,10 +8,9 @@ from yarl import URL
 import bittensor
 import requests
 
-__version__: typing.Final[str] = "0.0.2"
+__version__: typing.Final[str] = "0.0.3"
 OMRON_NETUID_FINNEY: typing.Final[int] = 2
 OMRON_NETUID_TESTNET: typing.Final[int] = 118
-API_PORT: typing.Final[int] = 8000
 
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.INFO)
@@ -23,16 +22,18 @@ logger = logging.getLogger(__name__)
 # logger.addHandler(file_handler)
 
 
-def get_omron_validator_ip(omron_validator_ss58: str, network: str = "finney") -> str:
+def get_omron_validator_axon(
+    omron_validator_ss58: str, network: str = "finney"
+) -> bittensor.AxonInfo:
     """
-    Get the IP address of a validator on the omron subnet.
+    Get the axon of a validator on the omron subnet.
     """
     btnetwork = bittensor.subtensor(network=network)
     omron_validator_axon = btnetwork.get_axon_info(
         netuid=(OMRON_NETUID_FINNEY if network == "finney" else OMRON_NETUID_TESTNET),
         hotkey_ss58=omron_validator_ss58,
     )
-    return omron_validator_axon.ip
+    return omron_validator_axon
 
 
 class Proof_Of_Weights:
@@ -48,11 +49,15 @@ class Proof_Of_Weights:
         Initialize the Proof of Weights class with your wallet and a validator's hotkey from the omron subnet.
         """
         self._wallet = bittensor.wallet(wallet_name, wallet_hotkey)
-        self._omron_validator_ip = get_omron_validator_ip(omron_validator_ss58, network)
+        self._omron_validator_axon = get_omron_validator_axon(
+            omron_validator_ss58, network
+        )
         self._netuid = netuid
         self._last_transaction_hash = ""
         self._base_url = URL.build(
-            scheme="http", host=self._omron_validator_ip, port=API_PORT
+            scheme="http",
+            host=self._omron_validator_axon.ip,
+            port=self._omron_validator_axon.port,
         )
 
     def submit_inputs(self, reward_function_inputs: list) -> str:

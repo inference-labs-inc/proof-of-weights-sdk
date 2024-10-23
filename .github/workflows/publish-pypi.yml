@@ -21,8 +21,9 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install setuptools wheel twine requests bittensor
-    - name: Build and publish
+        pip install setuptools wheel twine
+        pip install -r requirements.txt
+    - name: Build
       run: |
         python setup.py sdist bdist_wheel
     - name: Publish a Python distribution to PyPI

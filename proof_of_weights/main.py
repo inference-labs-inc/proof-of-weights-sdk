@@ -8,7 +8,7 @@ from yarl import URL
 import bittensor
 import requests
 
-__version__: typing.Final[str] = "0.0.4"
+__version__: typing.Final[str] = "0.0.5"
 OMRON_NETUID_FINNEY: typing.Final[int] = 2
 OMRON_NETUID_TESTNET: typing.Final[int] = 118
 

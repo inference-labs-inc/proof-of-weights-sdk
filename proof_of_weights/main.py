@@ -60,7 +60,7 @@ class Proof_Of_Weights:
             port=self._omron_validator_axon.port,
         )
 
-    def submit_inputs(self, reward_function_inputs: list) -> str:
+    def submit_inputs(self, reward_function_inputs: dict | list) -> str:
         """
         Submit reward function inputs from network with netuid to a validator on the omron subnet.
         """
@@ -71,9 +71,7 @@ class Proof_Of_Weights:
         # encode the inputs and signature as base64
         input_str = base64.b64encode(input_bytes).decode("utf-8")
         signature_str = base64.b64encode(signature).decode("utf-8")
-        self._last_transaction_hash = hashlib.sha256(
-            input_bytes + signature
-        ).hexdigest()
+        self._last_transaction_hash = _hash_inputs(reward_function_inputs)
 
         # send the reward function inputs and signature to the omron subnet on port API_PORT
         response = requests.post(
@@ -114,3 +112,21 @@ class Proof_Of_Weights:
         if response.status_code != 200:
             return {}
         return response.json()
+
+
+def _hash_inputs(inputs: dict) -> str:
+    """
+    Hashes inputs to proof of weights, excluding dynamic fields.
+
+    Args:
+        inputs (dict): The inputs to hash.
+
+    Returns:
+        str: The hashed inputs.
+    """
+    filtered_inputs = {
+        k: v
+        for k, v in inputs.items()
+        if k not in ["validator_uid", "nonce", "uid_responsible_for_proof"]
+    }
+    return hashlib.sha256(str(filtered_inputs).encode()).hexdigest()

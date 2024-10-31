@@ -13,13 +13,6 @@ OMRON_NETUID_FINNEY: typing.Final[int] = 2
 OMRON_NETUID_TESTNET: typing.Final[int] = 118
 
 logger = logging.getLogger(__name__)
-# logger.setLevel(logging.INFO)
-# logger.addHandler(logging.StreamHandler())
-# file_handler = logging.FileHandler(
-#     os.path.join(os.path.dirname(__file__), "proof_of_weights.log")
-# )
-# file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-# logger.addHandler(file_handler)
 
 
 def get_omron_validator_axon(
@@ -53,7 +46,7 @@ class Proof_Of_Weights:
             omron_validator_ss58, network
         )
         self._netuid = netuid
-        self._last_transaction_hash = ""
+        self._last_input_hash = ""
         self._base_url = URL.build(
             scheme="http",
             host=self._omron_validator_axon.ip,
@@ -71,7 +64,7 @@ class Proof_Of_Weights:
         # encode the inputs and signature as base64
         input_str = base64.b64encode(input_bytes).decode("utf-8")
         signature_str = base64.b64encode(signature).decode("utf-8")
-        self._last_transaction_hash = _hash_inputs(reward_function_inputs)
+        self._last_input_hash = _hash_inputs(reward_function_inputs)
 
         # send the reward function inputs and signature to the omron subnet on port API_PORT
         response = requests.post(
@@ -91,22 +84,22 @@ class Proof_Of_Weights:
             return ""
 
         data = response.json()
-        if data.get("hash") != self._last_transaction_hash:
+        if data.get("hash") != self._last_input_hash:
             logger.error(
-                f"Transaction hash mismatch. Local: {self._last_transaction_hash}, "
+                f"Transaction hash mismatch. Local: {self._last_input_hash}, "
                 f"Remote: {data.get('hash')}"
             )
             return ""
 
-        return self._last_transaction_hash
+        return self._last_input_hash
 
     def get_proof(self) -> dict:
         """
         Get the proof of weights from the omron subnet validator.
         """
         response = requests.get(
-            self._base_url.with_path(
-                f"get-proof-of-weights/{self._last_transaction_hash}"
+            self._base_url.with_path(f"get-proof-of-weights").with_query(
+                {"input_hash": self._last_input_hash}
             )
         )
         if response.status_code != 200:

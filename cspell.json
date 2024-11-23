@@ -12,6 +12,7 @@
         "levelname",
         "NETUID",
         "OMRON",
+        "opentensor",
         "pydantic",
         "substrateinterface",
         "subtensor",

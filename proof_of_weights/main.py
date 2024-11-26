@@ -1,15 +1,13 @@
 import base64
+import datetime
 import hashlib
 import json
-import typing
 import logging
-import random
-import string
-from yarl import URL
-from typing import Optional
+import typing
 
 import bittensor
 import requests
+from yarl import URL
 
 __version__: typing.Final[str] = "0.0.5"
 OMRON_NETUID_FINNEY: typing.Final[int] = 2
@@ -73,18 +71,19 @@ class Proof_Of_Weights:
         self,
         url: str,
         data: str = "",
-        salt: Optional[str] = "",
     ) -> dict[str, str]:
         """
         Sign the request with the wallet's hotkey and return proper headers with the signature.
         """
-        if salt is None:
-            salt = "".join(random.choices(string.ascii_letters + string.digits, k=32))
-        payload = f"{url}{salt}{data}".encode()
+        request_time = datetime.datetime.now(datetime.timezone.utc).strftime(
+            "%Y-%m-%dT%H:%M:%S.%f%z"
+        )
+        payload = f"{url}{request_time}{self._netuid}{data}".encode()
         signature = self._wallet.hotkey.sign(payload)
         return {
-            "X-Salt": salt,
+            "X-Request-Datetime": request_time,
             "X-Request-Signature": base64.b64encode(signature).decode("utf-8"),
+            "X-Netuid": str(self._netuid),
             "X-ss58-Address": self._wallet.hotkey.ss58_address,
         }
 
@@ -94,12 +93,7 @@ class Proof_Of_Weights:
         """
         self._last_input_hash = _hash_inputs(reward_function_inputs)
         # serialize the reward function inputs as json bytes
-        input_str = json.dumps(
-            {
-                "inputs": reward_function_inputs,
-                "netuid": self._netuid,
-            }
-        )
+        input_str = json.dumps(reward_function_inputs)
         url = self._base_url.with_path("submit-inputs")
 
         # send the reward function inputs and signature to the omron subnet on port API_PORT
